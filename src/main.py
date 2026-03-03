@@ -5,6 +5,7 @@ from src.warnings_config import suppress_warnings
 
 suppress_warnings()
 
+from src.bastion import register_public_key_on_bastion
 from src.config import load_environment_variables, load_tunnels
 from src.ssh_tunnel_service import start_ssh_tunnels
 from src.tunnels import get_ssh_tunnels_status, print_ssh_tunnels_status
@@ -50,6 +51,18 @@ def main() -> None:
         help="Comma-separated list of tags to filter tunnels (e.g. --tags=cri,snapshot)",
     )
 
+    # `tunnels repair` command — re-registers the local public key on all bastions
+    repair_parser = tunnels_subparsers.add_parser(
+        "repair",
+        help="Re-register local public key on bastion hosts (fixes authentication failures)",
+    )
+    repair_parser.add_argument(
+        "--tags",
+        type=str,
+        default=None,
+        help="Comma-separated list of tags to filter tunnels (e.g. --tags=cri,snapshot)",
+    )
+
     args = parser.parse_args()
 
     if args.resource == "tunnels" and args.action == "status":
@@ -70,6 +83,31 @@ def main() -> None:
             ssh_key_path=env.ssh_key_path,
             ssh_key_passphrase=env.ssh_key_passphrase,
         )
+
+    elif args.resource == "tunnels" and args.action == "repair":
+        tags = parse_tags(args.tags)
+        env = load_environment_variables()
+        tunnels = load_tunnels(tags)
+        statuses = get_ssh_tunnels_status(
+            tunnels=tunnels
+        )
+        failed_tunnels = [tunnel for tunnel in statuses if tunnel.enabled and not tunnel.active]
+        logging.info(f"Found {len(failed_tunnels)} failed tunnels that may require bastion key re-registration.")
+        # Deduplicate — many tunnels share the same bastion
+        seen_hosts: set[tuple[str, int]] = set()
+        for tunnel in failed_tunnels:
+            key = (tunnel.ssh_host, tunnel.ssh_port)
+            if key in seen_hosts:
+                continue
+            seen_hosts.add(key)
+            register_public_key_on_bastion(
+                ssh_host=tunnel.ssh_host,
+                ssh_user=env.ssh_user,
+                ssh_key_path=env.ssh_key_path,
+                ssh_key_passphrase=env.ssh_key_passphrase,
+                ssh_pub_key_path=env.ssh_pub_key_path,
+                ssh_port=tunnel.ssh_port
+            )
 
 
 if __name__ == "__main__":

@@ -27,6 +27,7 @@ def load_environment_variables() -> EnvironmentConfig:
     return EnvironmentConfig(
         ssh_user=get_var("SSH_USER"),
         ssh_key_path=get_var("SSH_KEY_PATH"),
+        ssh_pub_key_path=get_var("SSH_PUB_KEY_PATH"),
         ssh_key_passphrase=get_var("SSH_KEY_PASSPHRASE"),
     )
 

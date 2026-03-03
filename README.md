@@ -42,3 +42,8 @@ python -m src.main tunnels status --tags=cri
 ```bash
 python -m src.main tunnels start --tags=cri
 ```
+
+### Repair tunnels (filtered by tags)
+```bash
+python -m src.main tunnels repair --tags=cri
+```
