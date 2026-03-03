@@ -1,0 +1,10 @@
+tunnels:
+  - name: "App Name"
+    description: "Description of the tunnel"
+    ssh_host : "bastion-ad.eu-west-1.dev.cc.build"
+    ssh_port : 22
+    remote_host : "myhost.com"
+    remote_port : 8080
+    local_port : 9080
+    enabled: true
+    tags: ["app", "env"]
