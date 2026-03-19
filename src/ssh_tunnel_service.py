@@ -114,6 +114,10 @@ def start_ssh_tunnels(
                 logging.error(f"Failed to start tunnel {tunnel_config.name}: {e}")
         else:
             logging.warning(f"Skipping inactive tunnel: {tunnel_config.name}")
+
+    tunnel_status = get_ssh_tunnels_status(tunnels=tunnels)
+    print_ssh_tunnels_status(tunnel_status)
+
     input("Press Enter to exit...")
 
 if __name__ == "__main__":
