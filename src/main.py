@@ -103,6 +103,7 @@ def main() -> None:
             register_public_key_on_bastion(
                 ssh_host=tunnel.ssh_host,
                 ssh_user=env.ssh_user,
+                ssh_password=env.ssh_password,
                 ssh_key_path=env.ssh_key_path,
                 ssh_key_passphrase=env.ssh_key_passphrase,
                 ssh_pub_key_path=env.ssh_pub_key_path,

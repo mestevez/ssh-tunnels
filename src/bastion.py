@@ -9,6 +9,7 @@ from src.known_hosts import refresh_known_host
 def register_public_key_on_bastion(
     ssh_host: str,
     ssh_user: str,
+    ssh_password: str,
     ssh_key_path: str,
     ssh_key_passphrase: str,
     ssh_pub_key_path: str,
@@ -41,6 +42,7 @@ def register_public_key_on_bastion(
         hostname=ssh_host,
         port=ssh_port,
         username=ssh_user,
+        password=ssh_password,
         key_filename=key_path,
         passphrase=passphrase,
         allow_agent=True,   # fall back to ssh-agent if key_filename auth fails
